@@ -114,3 +114,14 @@ export const fetchAssessments = async (token: string): Promise<ApiResponse<any[]
     }, 800);
   });
 };
+import axios from 'axios';
+
+export const downloadReport = async (reportData: any) => {
+  const token = localStorage.getItem('token');
+  return axios.post('/api/download-report', reportData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    responseType: 'blob',
+  });
+};

@@ -18,12 +18,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
   return stored ? JSON.parse(stored) : [];
 };
 
-const saveUser = (newUser: { email: string; password: string }) => {
+const saveUser = (newUser: { email: string; password: string; name: string }) => {
   const users = getStoredUsers();
   users.push(newUser);
   localStorage.setItem('users', JSON.stringify(users));
 };
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,34 +97,35 @@ const saveUser = (newUser: { email: string; password: string }) => {
   setTimeout(() => {
     const users = getStoredUsers();
 
-    if (isLogin) {
-      // 🔒 Login: match user
-      const matchedUser = users.find(
-        (u: any) =>
-          u.email === formData.email && u.password === formData.password
-      );
+   if (isLogin) {
+  const matchedUser = users.find(
+    (u: any) => u.email === formData.email && u.password === formData.password
+  );
 
-      if (matchedUser) {
-        const token = 'mock-jwt-token-' + Date.now();
-        onLogin(token);
-      } else {
-        setError('Invalid email or password');
-      }
-    } else {
-      // 🆕 Signup: check if email already exists
-      const existingUser = users.find(
-        (u: any) => u.email === formData.email
-      );
+  if (matchedUser) {
+    const token = 'mock-jwt-token-' + Date.now();
+    localStorage.setItem('token', token);
+    localStorage.setItem('studentName', matchedUser.name || formData.name); 
+    
+    onLogin(token);
+  } else {
+    setError('Invalid email or password');
+  }
+} else {
+  const existingUser = users.find((u: any) => u.email === formData.email);
 
-      if (existingUser) {
-        setError('An account with this email already exists');
-      } else {
-        saveUser({ email: formData.email, password: formData.password });
-        const token = 'mock-jwt-token-' + Date.now();
-        onLogin(token);
-      }
-    }
-
+  if (existingUser) {
+    setError('An account with this email already exists');
+  } else {
+    saveUser({ email: formData.email, password: formData.password, name: formData.name }); // 🆕 Store name too
+    const token = 'mock-jwt-token-' + Date.now();
+    localStorage.setItem('token', token);
+    localStorage.setItem('studentName', formData.name); 
+    
+    
+    onLogin(token);
+  }
+}
     setIsLoading(false);
   }, 1500);
 };
