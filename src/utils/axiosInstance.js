@@ -1,6 +1,6 @@
 import API from './path/to/your/api/file';
 
-API.post('/api/download-report', {
+API.post('/download-report', {
   name: 'John Doe',
   subject: 'Math',
   score: 85,
