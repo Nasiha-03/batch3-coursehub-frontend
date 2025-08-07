@@ -1,7 +1,6 @@
 import axios from 'axios';
-
 const api = axios.create({
-  baseURL: 'https://server-m1hy.onrender.com, //
+  baseURL: 'https://server-m1hy.onrender.com', 
 });
 
 // ✅ Updated to POST with full assessment data
