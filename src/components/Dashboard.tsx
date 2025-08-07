@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAssessments, downloadReport } from '../utils/api';
 
-
 interface Assessment {
   id: string;
   subject: string;
@@ -12,7 +11,6 @@ interface Assessment {
   status: 'excellent' | 'good' | 'average' | 'poor';
   email: string;
 }
-
 
 interface DashboardProps {
   onLogout: () => void;
@@ -32,16 +30,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, authToken }) => 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
       if (currentScrollY > lastScrollY && currentScrollY > 50) {
         setShowHeader(false);
       } else {
         setShowHeader(true);
       }
-
       setLastScrollY(currentScrollY);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
@@ -89,44 +84,47 @@ export const Dashboard: React.FC<DashboardProps> = ({ onLogout, authToken }) => 
   };
 
   const handleDownload = async (assessment: Assessment) => {
-  setDownloadingId(assessment.id);
+    setDownloadingId(assessment.id);
 
-  try {
-    const studentName = localStorage.getItem('studentName') || 'Student';
+    try {
+      const studentName = localStorage.getItem('studentName') || 'Student';
 
-const response = await downloadReport({
-  name: studentName,      
-  subject: assessment.subject,
-  score: assessment.score,
-  maxScore: assessment.maxScore,
-  grade:
-    assessment.percentage >= 90
-      ? 'A+'
-      : assessment.percentage >= 80
-      ? 'A'
-      : assessment.percentage >= 70
-      ? 'B'
-      : 'C',
-  date: assessment.date,
-});
-    const blob = new Blob([response.data], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${assessment.subject}-report.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+      const grade =
+        assessment.percentage >= 90
+          ? 'A+'
+          : assessment.percentage >= 80
+          ? 'A'
+          : assessment.percentage >= 70
+          ? 'B'
+          : 'C';
 
-    showNotification(`${assessment.subject} report downloaded successfully!`, 'success');
-  } catch (error) {
-    console.error(error);
-    showNotification(`Failed to download report for ${assessment.subject}`, 'error');
-  } finally {
-    setDownloadingId(null);
-  }
-};
+      const response = await downloadReport({
+        name: studentName,
+        subject: assessment.subject,
+        score: assessment.score,
+        maxScore: assessment.maxScore,
+        grade: grade,
+        date: assessment.date,
+        generatedOn: new Date().toLocaleString(),
+      });
 
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${assessment.subject}-report.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      showNotification(`${assessment.subject} report downloaded successfully!`, 'success');
+    } catch (error) {
+      console.error(error);
+      showNotification(`Failed to download report for ${assessment.subject}`, 'error');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const sortedAssessments = assessments.slice().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const latestAssessment = sortedAssessments[0];
