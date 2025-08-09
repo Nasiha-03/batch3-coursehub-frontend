@@ -6,7 +6,6 @@ import { NotificationBanner } from './components/NotificationBanner';
 import { submitFeedback } from './utils/api';
 import { CheckCircle, Bell } from 'lucide-react';
 
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -33,21 +32,20 @@ function App() {
   };
 
   const handleLogout = () => {
-  const confirmLogout = window.confirm("Are you sure you want to logout?");
-  if (!confirmLogout) return;
+    const confirmLogout = window.confirm('Are you sure you want to logout?');
+    if (!confirmLogout) return;
 
-  localStorage.removeItem('authToken');
-  setAuthToken(null);
-  setIsAuthenticated(false);
-  setShowFeedback(false);
-  setShowNotificationBanner(true);
-};
-
+    localStorage.removeItem('authToken');
+    setAuthToken(null);
+    setIsAuthenticated(false);
+    setShowFeedback(false);
+    setShowNotificationBanner(true);
+  };
 
   const handleFeedbackSubmit = async (feedbackData: any) => {
     try {
       const response = await submitFeedback(feedbackData);
-      if (response.success) {
+      if (response?.success) {
         setFeedbackNotification({
           show: true,
           message: response.message,
@@ -109,7 +107,7 @@ function App() {
         </div>
       ) : (
         <>
-          <Dashboard onLogout={handleLogout} authToken={authToken} />
+          <Dashboard onLogout={handleLogout} authToken={authToken ?? ''} />
 
           <button
             onClick={() => setShowFeedback(true)}

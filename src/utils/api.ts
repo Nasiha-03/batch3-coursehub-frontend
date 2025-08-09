@@ -4,11 +4,12 @@ const api = axios.create({
   baseURL: 'https://server-m1hy.onrender.com', 
 });
 
-// ✅ Download Report Function
+// ✅ Download Report Function (expects full assessment details)
 export const downloadReport = async ({
   name,
   subject,
   score,
+  maxScore,
   grade,
   date,
 }: {
@@ -20,12 +21,14 @@ export const downloadReport = async ({
   date: string;
 }) => {
   const generatedOn = new Date().toLocaleString();
+
   const response = await api.post(
     '/api/download-report',
     {
       name,
       subject,
       score,
+      maxScore,
       grade,
       date,
       generatedOn,
@@ -34,17 +37,18 @@ export const downloadReport = async ({
       responseType: 'blob',
     }
   );
+
   return response.data;
 };
 
 // ✅ Fetch Assessments with Auth Token
 export const fetchAssessments = async (token: string) => {
-  return api.get('/assessments', {
+  return api.get('/api/assessments', {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
 
-// ✅ Submit Feedback using backend URL
+// ✅ Submit Feedback
 export const submitFeedback = async (data: any) => {
   try {
     const response = await api.post('/api/feedback', data);
